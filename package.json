@@ -4,6 +4,9 @@
   "module": "nodenext",
   "type": "module",
   "main": "index.js",
+  "repository": {
+    "url": "https://github.com/LukeMitchellWood/labels.git"
+  },
   "scripts": {
     "dev": "tsx --watch ./src/index.tsx",
     "css": "npx tailwindcss -i ./src/main.css -o ./static/css/main.css --watch"
