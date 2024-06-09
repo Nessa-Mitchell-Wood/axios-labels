@@ -1,0 +1,45 @@
+import AxiosLabel from './axios-label';
+
+type Template = {
+  title: string;
+  keys: string[];
+  update: Function;
+  specification: { key: String; value: string; span: number }[][];
+};
+
+export const LabelTemplate: FC<Template> = (props: Template) => {
+  const alpineData = `{
+      keys: [
+        ${props.keys.map((d) => `'${d}'`).join(',')}
+      ],
+      text: '',
+      details: [],
+      ${props.update.toString().replace('function ', '')},
+    }`
+    .split('  ')
+    .map((d) => d.trim())
+    .join('');
+  return (
+    <div x-data={alpineData}>
+      <form className="flex flex-col gap-4 w-full print:hidden">
+        <label
+          className="uppercase leading-none text-xs tracking-widest text-opacity-60 text-white"
+          htmlFor="#inputarea"
+        >
+          {props.title}
+        </label>
+        <textarea
+          className="bg-white text-black rounded h-8 text-xs p-2 opacity-25"
+          id="inputarea"
+          x-on:blur="update"
+          x-model="text"
+        ></textarea>
+      </form>
+      <div className="flex flex-row flex-wrap gap-4 justify-center print:block opacity-25 print:opacity-100">
+        <template x-for="detail in details">
+          <AxiosLabel specification={props.specification} />
+        </template>
+      </div>
+    </div>
+  );
+};
