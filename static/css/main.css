@@ -688,10 +688,6 @@ video {
   height: 2rem;
 }
 
-.h-\[20ch\] {
-  height: 20ch;
-}
-
 .h-\[48\.15mm\] {
   height: 48.15mm;
 }
@@ -710,22 +706,6 @@ video {
 
 .h-full {
   height: 100%;
-}
-
-.h-\[2ch\] {
-  height: 2ch;
-}
-
-.h-\[3ch\] {
-  height: 3ch;
-}
-
-.h-4 {
-  height: 1rem;
-}
-
-.h-12 {
-  height: 3rem;
 }
 
 .min-h-dvh {
@@ -842,15 +822,6 @@ video {
   border-color: transparent;
 }
 
-.border-white {
-  --tw-border-opacity: 1;
-  border-color: rgb(255 255 255 / var(--tw-border-opacity));
-}
-
-.border-opacity-60 {
-  --tw-border-opacity: 0.6;
-}
-
 .bg-purple-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(168 85 247 / var(--tw-bg-opacity));
@@ -866,10 +837,6 @@ video {
   background-color: rgb(2 6 23 / var(--tw-bg-opacity));
 }
 
-.bg-transparent {
-  background-color: transparent;
-}
-
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
@@ -877,18 +844,6 @@ video {
 
 .bg-opacity-40 {
   --tw-bg-opacity: 0.4;
-}
-
-.bg-opacity-60 {
-  --tw-bg-opacity: 0.6;
-}
-
-.bg-opacity-35 {
-  --tw-bg-opacity: 0.35;
-}
-
-.bg-opacity-25 {
-  --tw-bg-opacity: 0.25;
 }
 
 .bg-gradient-to-br {
@@ -911,10 +866,6 @@ video {
 
 .p-\[3mm\] {
   padding: 3mm;
-}
-
-.p-4 {
-  padding: 1rem;
 }
 
 .px-1 {
@@ -952,17 +903,13 @@ video {
   padding-bottom: 0.5rem;
 }
 
-.py-8 {
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-}
-
 .py-4 {
   padding-top: 1rem;
   padding-bottom: 1rem;
 }
 
-.pb-8 {
+.py-8 {
+  padding-top: 2rem;
   padding-bottom: 2rem;
 }
 
@@ -1002,11 +949,6 @@ video {
 .text-base {
   font-size: 1rem;
   line-height: 1.5rem;
-}
-
-.text-lg {
-  font-size: 1.125rem;
-  line-height: 1.75rem;
 }
 
 .text-sm {
@@ -1066,12 +1008,8 @@ video {
   --tw-text-opacity: 0.8;
 }
 
-.text-opacity-35 {
-  --tw-text-opacity: 0.35;
-}
-
-.text-opacity-25 {
-  --tw-text-opacity: 0.25;
+.opacity-25 {
+  opacity: 0.25;
 }
 
 .opacity-50 {
@@ -1084,10 +1022,6 @@ video {
 
 .opacity-80 {
   opacity: 0.8;
-}
-
-.opacity-25 {
-  opacity: 0.25;
 }
 
 .shadow {
@@ -1103,11 +1037,6 @@ video {
 
 .brightness-0 {
   --tw-brightness: brightness(0);
-  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
-}
-
-.brightness-50 {
-  --tw-brightness: brightness(.5);
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 

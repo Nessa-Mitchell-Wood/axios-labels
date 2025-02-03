@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "tsx --watch ./src/index.tsx",
+    "start": "tsx ./src/index.tsx",
     "css": "npx tailwindcss -i ./src/main.css -o ./static/css/main.css --watch"
   },
   "keywords": [],

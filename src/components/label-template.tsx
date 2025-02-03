@@ -29,13 +29,13 @@ export const LabelTemplate: FC<Template> = (props: Template) => {
           {props.title}
         </label>
         <textarea
-          className="bg-white text-black rounded h-8 text-xs p-2 opacity-25"
+          className="bg-white text-black rounded h-8 text-xs p-2 opacity-80"
           id="inputarea"
           x-on:blur="update"
           x-model="text"
         ></textarea>
       </form>
-      <div className="flex flex-row flex-wrap gap-4 justify-center print:block opacity-25 print:opacity-100">
+      <div className="flex flex-row flex-wrap gap-4 justify-center print:block opacity-80 print:opacity-100">
         <template x-for="detail in details">
           <AxiosLabel specification={props.specification} />
         </template>

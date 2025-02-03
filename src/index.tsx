@@ -10,7 +10,7 @@ const app = new Hono();
 
 app.use('/static/*', serveStatic({ root: './' }));
 
-const Page: FC<PropsWithChildren> = (props: PropsWithChildren) => {
+const Page: FC<{title: string}> = (props:PropsWithChildren<{title:string}>) => {
   return (
     <html lang="en" className="bg-slate-950">
       <head>
@@ -77,7 +77,7 @@ app.get('/', (c) => {
     'Material',
   ];
   return c.html(
-    <Page>
+    <Page title="Label Maker">
       <div className="flex flex-wrap justify-center gap-2 print:hidden">
         {processes.map((process) => {
           return (

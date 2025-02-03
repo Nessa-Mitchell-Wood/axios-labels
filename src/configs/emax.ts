@@ -2,8 +2,10 @@ export const emaxConfig = {
   title: 'Emax',
   specification: [
     [
-      { key: 'Client', value: 'detail.client', span: 6 },
-      { key: 'Material', value: '() => "Emax"', span: 6 },
+      { key: 'Client', value: 'detail.client', span: 3 },
+      { key: 'Material', value: '() => "Emax"', span: 3 },
+      { key: 'Shade', value: 'detail.shade', span: 3 },
+      { key: 'Position', value: 'detail.position', span: 3 },
     ],
     [
       { key: 'Due', value: 'detail.due', span: 6 },
