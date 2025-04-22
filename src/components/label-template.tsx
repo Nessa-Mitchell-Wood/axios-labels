@@ -20,8 +20,14 @@ export const LabelTemplate: FC<Template> = (props: Template) => {
     .map((d) => d.trim())
     .join('');
   return (
-    <div x-data={alpineData}>
-      <form className="flex flex-col gap-4 w-full print:hidden">
+    <div>
+      <form
+        className="flex flex-col gap-4 w-full print:hidden"
+        hx-swap="innerHTML"
+        hx-trigger="change"
+        hx-target="#labels"
+        hx-post={`/${props.title.toLowerCase()}/labels`}
+      >
         <label
           className="uppercase leading-none text-xs tracking-widest text-opacity-60 text-white"
           htmlFor="#inputarea"
@@ -30,16 +36,13 @@ export const LabelTemplate: FC<Template> = (props: Template) => {
         </label>
         <textarea
           className="bg-white text-black rounded h-8 text-xs p-2 opacity-80"
-          id="inputarea"
-          x-on:blur="update"
-          x-model="text"
+          name="labelData"
         ></textarea>
       </form>
-      <div className="flex flex-row flex-wrap gap-4 justify-center print:block opacity-80 print:opacity-100">
-        <template x-for="detail in details">
-          <AxiosLabel specification={props.specification} />
-        </template>
-      </div>
+      <div
+        id="labels"
+        className="flex flex-row flex-wrap gap-4 justify-center print:block opacity-80 print:opacity-100"
+      ></div>
     </div>
   );
 };

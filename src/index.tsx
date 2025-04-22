@@ -4,13 +4,17 @@ import { serveStatic } from '@hono/node-server/serve-static';
 import { FC, PropsWithChildren } from 'hono/jsx';
 import { LabelTemplate } from './components/label-template';
 import { Config } from './config';
-import { MaterialLabel, Label } from './components/material-label';
+import { toDataURL } from 'qrcode';
+import { randomUUID } from 'node:crypto';
+// import { MaterialLabel, Label } from './components/material-label';
 
 const app = new Hono();
 
 app.use('/static/*', serveStatic({ root: './' }));
 
-const Page: FC<{title: string}> = (props:PropsWithChildren<{title:string}>) => {
+const Page: FC<{ title: string }> = (
+  props: PropsWithChildren<{ title: string }>
+) => {
   return (
     <html lang="en" className="bg-slate-950">
       <head>
@@ -108,7 +112,7 @@ const labelMap = new Map([
   ['pmma', <LabelTemplate {...Config.pmma} />],
   ['cocr', <LabelTemplate {...Config.cocr} />],
   ['ti', <LabelTemplate {...Config.ti} />],
-  ['material', <MaterialLabel />],
+  // ['material', <MaterialLabel />],
 ]);
 
 app.get('/label/:process', (c) => {
@@ -122,6 +126,94 @@ app.get('/label/:process', (c) => {
         <p className="text-red-500 border-red-500 bg-red-200 rounded-full border shadow py-2 px-8">{`Error: Whoops! Looks like ${process} isn't a thing...`}</p>
       )}
     </>
+  );
+});
+
+app.post('/:process/labels', async (c) => {
+  const process = c.req.param('process');
+  const body = await c.req.formData();
+  console.log(body);
+  const jobs = body.get('labelData').split('\n');
+  const jobObjects = jobs.map((job) => {
+    const jobFields = job.split('\t');
+    return Config[process].keys.reduce((j, key, index) => {
+      j[key] = jobFields[index];
+      return j;
+    }, {});
+  });
+  return c.html(
+    <div className="">
+      {jobObjects.map(async (job) => {
+        const {
+          patient,
+          job: jobnumber,
+          material,
+          units,
+          run: jobname,
+          manufacture,
+        } = job;
+        const keys = [
+          'job number',
+          'material',
+          'units',
+          'job name',
+          'manufacture',
+        ];
+        return (
+          <div className="bg-white w-[69mm] h-[48mm] rounded text-black p-[4mm] text-[3mm] mb-4 flex flex-col justify-between">
+            <div className="flex justify-between gap-[2mm] items-start mb-[4mm]">
+              <div className="">
+                <img
+                  className="h-[4mm] mb-[0.5mm]"
+                  src="/static/assets/axios-logo.svg"
+                  alt=""
+                />
+                <h2 className="capitalize text-[4mm] font-bold">
+                  {patient.toLowerCase().replace(',', '').replace(/\w\(/, ' (')}
+                </h2>
+              </div>
+              <img
+                className="h-[4.768em] w-auto"
+                src={await toDataURL(
+                  JSON.stringify({
+                    jobnumber,
+                    patient,
+                    material: material || process,
+                    units,
+                    jobname: jobname || randomUUID().split('-').slice(-1),
+                    manufacture:
+                      manufacture || new Date().toLocaleDateString('en-au'),
+                  }),
+                  {
+                    margin: 0,
+                    errorCorrectionLevel: 'L',
+                  }
+                )}
+                alt=""
+              />
+            </div>
+            <div className="">
+              <div className="flex gap-[3mm] flex-wrap items-end">
+                {[
+                  jobnumber,
+                  material || process,
+                  units,
+                  jobname,
+                  manufacture,
+                ].map((d, index) => {
+                  return (
+                    <div className="min-w-[18mm]">
+                      <h3 className="uppercase text-[2mm]">{keys[index]}</h3>
+                      <p className="capitalize text-[2.5mm]">{d}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 });
 

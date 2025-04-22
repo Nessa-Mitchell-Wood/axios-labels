@@ -33,6 +33,7 @@ export const asigaConfig = {
     'status',
     'printer',
     'run',
+    'manufacture',
   ],
   update: function update() {
     this.details = this.text
