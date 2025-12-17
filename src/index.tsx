@@ -1,18 +1,18 @@
-import "dotenv/config";
-import { Hono } from "hono";
-import { serve } from "@hono/node-server";
-import { serveStatic } from "@hono/node-server/serve-static";
-import { Child, FC, PropsWithChildren } from "hono/jsx";
-import { LabelTemplate } from "./components/label-template";
-import { Config } from "./config";
-import { createHash } from "node:crypto";
-import { Barcode } from "./components/barcode";
-import { pngurlQR } from "./components/dataQr";
+import 'dotenv/config';
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server';
+import { serveStatic } from '@hono/node-server/serve-static';
+import { Child, FC, PropsWithChildren } from 'hono/jsx';
+import { LabelTemplate } from './components/label-template';
+import { Config } from './config';
+import { createHash } from 'node:crypto';
+import { Barcode } from './components/barcode';
+import { pngurlQR } from './components/dataQr';
 
 const { signature } = process.env;
 const app = new Hono();
 
-app.use("/static/*", serveStatic({ root: "./" }));
+app.use('/static/*', serveStatic({ root: './' }));
 
 function Page({ title, children }: PropsWithChildren<{ title: string }>) {
   return (
@@ -66,18 +66,18 @@ function Page({ title, children }: PropsWithChildren<{ title: string }>) {
   );
 }
 
-app.get("/", (c) => {
+app.get('/', (c) => {
   const processes = [
-    "Asiga",
-    "Splints",
-    "Projet",
-    "Emax",
-    "Zr",
-    "Wax",
-    "PMMA",
-    "Sintec",
-    "CoCr",
-    "Ti",
+    'Asiga',
+    'Splints',
+    'Projet',
+    'Emax',
+    'Zr',
+    'Wax',
+    'PMMA',
+    'Sintec',
+    'CoCr',
+    'Ti',
   ];
   return c.html(
     <Page title="Label Maker">
@@ -101,20 +101,20 @@ app.get("/", (c) => {
 });
 
 const labelMap = new Map([
-  ["asiga", <LabelTemplate {...Config.asiga} />],
-  ["splints", <LabelTemplate {...Config.splints} />],
-  ["projet", <LabelTemplate {...Config.projet} />],
-  ["emax", <LabelTemplate {...Config.emax} />],
-  ["zr", <LabelTemplate {...Config.zr} />],
-  ["wax", <LabelTemplate {...Config.wax} />],
-  ["sintec", <LabelTemplate {...Config.sintec} />],
-  ["pmma", <LabelTemplate {...Config.pmma} />],
-  ["cocr", <LabelTemplate {...Config.cocr} />],
-  ["ti", <LabelTemplate {...Config.ti} />],
+  ['asiga', <LabelTemplate {...Config.asiga} />],
+  ['splints', <LabelTemplate {...Config.splints} />],
+  ['projet', <LabelTemplate {...Config.projet} />],
+  ['emax', <LabelTemplate {...Config.emax} />],
+  ['zr', <LabelTemplate {...Config.zr} />],
+  ['wax', <LabelTemplate {...Config.wax} />],
+  ['sintec', <LabelTemplate {...Config.sintec} />],
+  ['pmma', <LabelTemplate {...Config.pmma} />],
+  ['cocr', <LabelTemplate {...Config.cocr} />],
+  ['ti', <LabelTemplate {...Config.ti} />],
 ]);
 
-app.get("/label/:process", (c) => {
-  const process = c.req.param("process");
+app.get('/label/:process', (c) => {
+  const process = c.req.param('process');
   return c.html(
     <>
       {labelMap.has(process) ? (
@@ -161,12 +161,13 @@ const JobQR: FC<{
     units,
     jobname,
     manufacture,
-  ].map((d) => d.replace(/,/gi, ""));
-  const hash = createHash("md5")
+  ].map((d) => d);
+  // .map((d) => d.replace(/,/gi, ""));
+  const hash = createHash('md5')
     .update(JSON.stringify(data))
     .update(signature)
-    .digest("hex");
-  const payload = [...data, hash].join(",");
+    .digest('hex');
+  const payload = [...data, hash].join(',');
   const url = await pngurlQR({ data: payload });
   return <img src={url} className="h-[18mm] w-auto" />;
 };
@@ -179,23 +180,23 @@ const Logo: FC = () => (
   />
 );
 
-app.post("/:process/labels", async (c) => {
-  const process = c.req.param("process");
+app.post('/:process/labels', async (c) => {
+  const process = c.req.param('process');
   const body = await c.req.formData();
-  const jobs = (body.get("labelData") as string).split("\n");
+  const jobs = (body.get('labelData') as string).split('\n');
   const { keys, mappings, ordering, labelKeys } = Config[process];
   const label_keys = labelKeys || [
-    ["Job", "jobnumber"],
-    ["Material", "material"],
-    ["Units", "units"],
-    ["Job Name", "jobname"],
-    ["Manufacture", "manufacture"],
+    ['Job', 'jobnumber'],
+    ['Material', 'material'],
+    ['Units', 'units'],
+    ['Job Name', 'jobname'],
+    ['Manufacture', 'manufacture'],
   ];
   const mappedJobs = jobs
     .map((job) => {
-      const jobFields = job.split("\t");
+      const jobFields = job.split('\t');
       return keys.reduce((j, key, index) => {
-        j[key] = jobFields[index] || "";
+        j[key] = jobFields[index] || '';
         return j;
       }, {});
     })
@@ -233,7 +234,7 @@ app.post("/:process/labels", async (c) => {
             <div className="mt-auto">
               <div className="flex gap-[1.5mm] flex-wrap justify-start">
                 {label_keys.map((key, index) => {
-                  if (key[0] === "id") {
+                  if (key[0] === 'id') {
                     return <Barcode data={mappedJob[key[0]]} />;
                   } else {
                     return (
@@ -265,11 +266,11 @@ const server = serve(
   (info) => console.log(`Running Axios Labels on port ${info.port}...`)
 );
 
-process.on("SIGINT", () => {
+process.on('SIGINT', () => {
   server.close();
   process.exit(0);
 });
-process.on("SIGTERM", () => {
+process.on('SIGTERM', () => {
   server.close((err) => {
     if (err) {
       console.error(err);

@@ -1,50 +1,49 @@
+import { PatientTitle } from './patient-title';
+
 export const cocrConfig = {
-  title: "CoCr",
+  title: 'CoCr',
   keys: [
-    "jobnumber",
-    "priority",
-    "client",
-    "patient",
-    "units",
-    "notes",
-    "due",
-    "loading",
-    "finishing",
-    "jobname",
-    "position",
-    "status",
-    "manufacture",
+    'job',
+    'priority',
+    'client',
+    'patient',
+    'classification',
+    'units',
+    'notes',
+    'due',
+    'loading',
+    'finishing',
+    'jobfile',
+    'position',
+    'status',
+    'manufacturedate',
   ],
   mappings: [
+    { key: 'client', value: (i) => i },
     {
-      key: "patient",
-      value: (patient, details) => {
-        return {
-          html: (
-            <h2 className="leading-none text-[4mm] font-medium m-0 p-0 capitalize">
-              {patient}
-            </h2>
-          ),
-          value: patient,
-        };
-      },
+      key: 'patient',
+      value: (patient, details) => ({
+        html: <PatientTitle patient={patient} label="Cr" />,
+        value: patient,
+      }),
     },
-    { key: "jobnumber", value: (ident) => ident },
-    { key: "material", value: () => "CoCr" },
-    { key: "units", value: (ident) => ident },
-    { key: "jobname", value: (ident) => ident },
+    { key: 'job', value: (ident) => ident },
+    { key: 'classification', value: (i) => i },
+    { key: 'units', value: (ident) => ident },
+    { key: 'jobfile', value: (ident) => ident },
     {
-      key: "manufacture",
+      key: 'manufacturedate',
       value: (ident) => ident,
     },
-    { key: "notes", value: (note) => (note ? note : "") },
+    { key: 'notes', value: (note) => (note ? note : '') },
   ],
   labelKeys: [
-    ["Job", "jobnumber"],
-    ["Material", "material"],
-    ["Units", "units"],
-    ["Job Name", "jobname"],
-    ["Manufacture", "manufacture"],
-    ["Notes", "notes"],
+    ['Client', 'client'],
+    ['Job', 'job'],
+    ['Material', 'classification'],
+    ['Units', 'units'],
+    ['Job Name', 'jobfile'],
+    ['Manufacture', 'manufacturedate'],
+    ['Notes', 'notes'],
   ],
 };

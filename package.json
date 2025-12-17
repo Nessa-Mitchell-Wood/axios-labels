@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.js",
   "repository": {
-    "url": "https://github.com/LukeMitchellWood/labels.git"
+    "url": "git@github.com:Nessa-Mitchell-Wood/axios-labels.git"
   },
   "scripts": {
     "dev": "npx tsx --watch ./src/index.tsx",

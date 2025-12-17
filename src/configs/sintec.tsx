@@ -1,34 +1,38 @@
 import { PatientTitle } from './patient-title';
 
-export const pmmaConfig = {
-  title: 'PMMA',
+export const sintecConfig = {
+  title: 'Sintec',
   keys: [
     'job',
     'priority',
     'client',
     'patient',
-    'classification',
-    'shade',
     'units',
     'notes',
     'due',
     'loading',
-    'machine',
+    'finishing',
+    'pos1',
+    'pos2',
+    'pos3',
+    'pos4',
+    'pos5',
+    'pos6',
     'jobfile',
     'status',
     'manufacturedate',
   ],
   mappings: [
+    { key: 'client', value: (ident) => ident },
     {
       key: 'patient',
-      value: (patient, details) => ({
-        html: <PatientTitle patient={patient} label="Pm" />,
+      value: (patient) => ({
+        html: <PatientTitle patient={patient} label="Sn" />,
         value: patient,
       }),
     },
     { key: 'job', value: (ident) => ident },
-    { key: 'client', value: (ident) => ident },
-    { key: 'classification', value: (ident) => ident },
+    { key: 'material', value: (ident) => 'Sintec' },
     { key: 'units', value: (ident) => ident },
     { key: 'jobfile', value: (ident) => ident },
     {
@@ -39,7 +43,7 @@ export const pmmaConfig = {
   labelKeys: [
     ['Client', 'client'],
     ['Job', 'job'],
-    ['Material', 'classification'],
+    ['Material', 'material'],
     ['Units', 'units'],
     ['Job Name', 'jobfile'],
     ['Manufacture', 'manufacturedate'],

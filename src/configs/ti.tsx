@@ -1,33 +1,32 @@
 import { PatientTitle } from './patient-title';
 
-export const pmmaConfig = {
-  title: 'PMMA',
+export const tiConfig = {
+  title: 'Ti',
   keys: [
     'job',
     'priority',
     'client',
     'patient',
     'classification',
-    'shade',
     'units',
     'notes',
     'due',
     'loading',
-    'machine',
+    'finishing',
     'jobfile',
     'status',
     'manufacturedate',
   ],
   mappings: [
+    { key: 'client', value: (ident) => ident },
     {
       key: 'patient',
-      value: (patient, details) => ({
-        html: <PatientTitle patient={patient} label="Pm" />,
+      value: (patient) => ({
+        html: <PatientTitle patient={patient} label="Ti" />,
         value: patient,
       }),
     },
     { key: 'job', value: (ident) => ident },
-    { key: 'client', value: (ident) => ident },
     { key: 'classification', value: (ident) => ident },
     { key: 'units', value: (ident) => ident },
     { key: 'jobfile', value: (ident) => ident },
