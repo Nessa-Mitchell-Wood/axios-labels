@@ -1,28 +1,14 @@
-import AxiosLabel from './axios-label';
+import AxiosLabel from "./axios-label";
 
 type Template = {
   title: string;
-  keys: string[];
-  update: Function;
-  specification: { key: String; value: string; span: number }[][];
 };
 
 export const LabelTemplate: FC<Template> = (props: Template) => {
-  const alpineData = `{
-      keys: [
-        ${props.keys.map((d) => `'${d}'`).join(',')}
-      ],
-      text: '',
-      details: [],
-      ${props.update.toString().replace('function ', '')},
-    }`
-    .split('  ')
-    .map((d) => d.trim())
-    .join('');
   return (
     <div>
       <form
-        className="flex flex-col gap-4 w-full print:hidden"
+        className="flex flex-col gap-4 w-full print:hidden mb-12"
         hx-swap="innerHTML"
         hx-trigger="change"
         hx-target="#labels"

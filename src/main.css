@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --gra0: 45deg;
@@ -18,4 +16,11 @@
       rgba(18, 115, 241, 0.1),
       rgba(27, 207, 223, 0.1)
     );
+}
+.barcode {
+  overflow: hidden;
+  @apply h-[6mm];
+}
+.barcode > svg {
+  @apply w-[63mm] h-auto;
 }

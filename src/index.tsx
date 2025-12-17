@@ -1,26 +1,26 @@
-import { Hono } from 'hono';
-import { serve } from '@hono/node-server';
-import { serveStatic } from '@hono/node-server/serve-static';
-import { FC, PropsWithChildren } from 'hono/jsx';
-import { LabelTemplate } from './components/label-template';
-import { Config } from './config';
-import { toDataURL } from 'qrcode';
-import { randomUUID } from 'node:crypto';
-// import { MaterialLabel, Label } from './components/material-label';
+import "dotenv/config";
+import { Hono } from "hono";
+import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
+import { Child, FC, PropsWithChildren } from "hono/jsx";
+import { LabelTemplate } from "./components/label-template";
+import { Config } from "./config";
+import { createHash } from "node:crypto";
+import { Barcode } from "./components/barcode";
+import { pngurlQR } from "./components/dataQr";
 
+const { signature } = process.env;
 const app = new Hono();
 
-app.use('/static/*', serveStatic({ root: './' }));
+app.use("/static/*", serveStatic({ root: "./" }));
 
-const Page: FC<{ title: string }> = (
-  props: PropsWithChildren<{ title: string }>
-) => {
+function Page({ title, children }: PropsWithChildren<{ title: string }>) {
   return (
     <html lang="en" className="bg-slate-950">
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>{props.title}</title>
+        <title>{title}</title>
         <link rel="stylesheet" href="/static/css/material-icons.css" />
         <link rel="stylesheet" href="/static/css/main.css" />
         <script src="/static/js/htmx.js" defer></script>
@@ -58,27 +58,26 @@ const Page: FC<{ title: string }> = (
             </div>
           </header>
           <div className="container max-w-xl m-auto py-12 px-4 print:p-0 print:m-0 print:max-w-full">
-            {props.children}
+            {children}
           </div>
         </div>
       </body>
     </html>
   );
-};
+}
 
-app.get('/', (c) => {
+app.get("/", (c) => {
   const processes = [
-    'Asiga',
-    'Splints',
-    'Projet',
-    'Emax',
-    'Zr',
-    'Wax',
-    'PMMA',
-    'Sintec',
-    'CoCr',
-    'Ti',
-    'Material',
+    "Asiga",
+    "Splints",
+    "Projet",
+    "Emax",
+    "Zr",
+    "Wax",
+    "PMMA",
+    "Sintec",
+    "CoCr",
+    "Ti",
   ];
   return c.html(
     <Page title="Label Maker">
@@ -102,22 +101,20 @@ app.get('/', (c) => {
 });
 
 const labelMap = new Map([
-  ['asiga', <LabelTemplate {...Config.asiga} />],
-  ['splints', <LabelTemplate {...Config.splints} />],
-  ['projet', <LabelTemplate {...Config.projet} />],
-  ['emax', <LabelTemplate {...Config.emax} />],
-  ['zr', <LabelTemplate {...Config.zr} />],
-  ['wax', <LabelTemplate {...Config.wax} />],
-  ['sintec', <LabelTemplate {...Config.sintec} />],
-  ['pmma', <LabelTemplate {...Config.pmma} />],
-  ['cocr', <LabelTemplate {...Config.cocr} />],
-  ['ti', <LabelTemplate {...Config.ti} />],
-  // ['material', <MaterialLabel />],
+  ["asiga", <LabelTemplate {...Config.asiga} />],
+  ["splints", <LabelTemplate {...Config.splints} />],
+  ["projet", <LabelTemplate {...Config.projet} />],
+  ["emax", <LabelTemplate {...Config.emax} />],
+  ["zr", <LabelTemplate {...Config.zr} />],
+  ["wax", <LabelTemplate {...Config.wax} />],
+  ["sintec", <LabelTemplate {...Config.sintec} />],
+  ["pmma", <LabelTemplate {...Config.pmma} />],
+  ["cocr", <LabelTemplate {...Config.cocr} />],
+  ["ti", <LabelTemplate {...Config.ti} />],
 ]);
 
-app.get('/label/:process', (c) => {
-  const process = c.req.param('process');
-  console.log({ process });
+app.get("/label/:process", (c) => {
+  const process = c.req.param("process");
   return c.html(
     <>
       {labelMap.has(process) ? (
@@ -129,84 +126,127 @@ app.get('/label/:process', (c) => {
   );
 });
 
-app.post('/:process/labels', async (c) => {
-  const process = c.req.param('process');
+const JobQR: FC<{
+  jobnumber: string;
+  patient: {
+    html: Child;
+    value: string;
+  };
+  material: string;
+  units: string;
+  jobname: string;
+  manufacture: string;
+}> = async ({
+  jobnumber,
+  patient,
+  material,
+  units,
+  jobname,
+  manufacture,
+}: {
+  jobnumber: string;
+  patient: {
+    html: Child;
+    value: string;
+  };
+  material: string;
+  units: string;
+  jobname: string;
+  manufacture: string;
+}) => {
+  const data = [
+    jobnumber,
+    patient.value,
+    material,
+    units,
+    jobname,
+    manufacture,
+  ].map((d) => d.replace(/,/gi, ""));
+  const hash = createHash("md5")
+    .update(JSON.stringify(data))
+    .update(signature)
+    .digest("hex");
+  const payload = [...data, hash].join(",");
+  const url = await pngurlQR({ data: payload });
+  return <img src={url} className="h-[18mm] w-auto" />;
+};
+
+const Logo: FC = () => (
+  <img
+    className="h-[4mm] mb-[0.5mm]"
+    src="/static/assets/axios-logo.svg"
+    alt=""
+  />
+);
+
+app.post("/:process/labels", async (c) => {
+  const process = c.req.param("process");
   const body = await c.req.formData();
-  console.log(body);
-  const jobs = body.get('labelData').split('\n');
-  const jobObjects = jobs.map((job) => {
-    const jobFields = job.split('\t');
-    return Config[process].keys.reduce((j, key, index) => {
-      j[key] = jobFields[index];
-      return j;
-    }, {});
-  });
+  const jobs = (body.get("labelData") as string).split("\n");
+  const { keys, mappings, ordering, labelKeys } = Config[process];
+  const label_keys = labelKeys || [
+    ["Job", "jobnumber"],
+    ["Material", "material"],
+    ["Units", "units"],
+    ["Job Name", "jobname"],
+    ["Manufacture", "manufacture"],
+  ];
+  const mappedJobs = jobs
+    .map((job) => {
+      const jobFields = job.split("\t");
+      return keys.reduce((j, key, index) => {
+        j[key] = jobFields[index] || "";
+        return j;
+      }, {});
+    })
+    .map((job) => {
+      return mappings.reduce((acc, mapping) => {
+        acc[mapping.key] = mapping.value(job[mapping.key], job);
+        return acc;
+      }, {});
+    })
+    .sort(ordering);
+
   return c.html(
     <div className="">
-      {jobObjects.map(async (job) => {
-        const {
-          patient,
-          job: jobnumber,
-          material,
-          units,
-          run: jobname,
-          manufacture,
-        } = job;
-        const keys = [
-          'job number',
-          'material',
-          'units',
-          'job name',
-          'manufacture',
-        ];
+      {mappedJobs.map(async (mappedJob) => {
+        const { patient, jobnumber, material, units, jobname, manufacture } =
+          mappedJob;
         return (
-          <div className="bg-white w-[69mm] h-[48mm] rounded text-black p-[4mm] text-[3mm] mb-4 flex flex-col justify-between">
-            <div className="flex justify-between gap-[2mm] items-start mb-[4mm]">
+          <div className="bg-white w-[69mm] h-[48mm] rounded text-black p-[3mm] text-[3mm] flex flex-col justify-between mb-4">
+            <div className="flex justify-between gap-[2mm] items-start">
               <div className="">
-                <img
-                  className="h-[4mm] mb-[0.5mm]"
-                  src="/static/assets/axios-logo.svg"
-                  alt=""
-                />
-                <h2 className="capitalize text-[4mm] font-bold">
-                  {patient.toLowerCase().replace(',', '').replace(/\w\(/, ' (')}
-                </h2>
+                <Logo />
+                <div className="mt-[2mm]">{patient.html}</div>
               </div>
-              <img
-                className="h-[4.768em] w-auto"
-                src={await toDataURL(
-                  JSON.stringify({
-                    jobnumber,
-                    patient,
-                    material: material || process,
-                    units,
-                    jobname: jobname || randomUUID().split('-').slice(-1),
-                    manufacture:
-                      manufacture || new Date().toLocaleDateString('en-au'),
-                  }),
-                  {
-                    margin: 0,
-                    errorCorrectionLevel: 'L',
-                  }
-                )}
-                alt=""
-              />
-            </div>
-            <div className="">
-              <div className="flex gap-[3mm] flex-wrap items-end">
-                {[
+              <JobQR
+                {...{
+                  patient,
                   jobnumber,
-                  material || process,
+                  material,
                   units,
                   jobname,
                   manufacture,
-                ].map((d, index) => {
-                  return (
-                    <div className="min-w-[18mm]">
-                      <h3 className="uppercase text-[2mm]">{keys[index]}</h3>
-                      <p className="capitalize text-[2.5mm]">{d}</p>
-                    </div>
-                  );
+                }}
+              />
+            </div>
+            <div className="mt-auto">
+              <div className="flex gap-[1.5mm] flex-wrap justify-start">
+                {label_keys.map((key, index) => {
+                  if (key[0] === "id") {
+                    return <Barcode data={mappedJob[key[0]]} />;
+                  } else {
+                    return (
+                      <div className="min-w-[8mm] leading-none">
+                        <h3 className="uppercase text-[2mm] mb-[0.5mm]">
+                          {key[0]}
+                        </h3>
+                        <p className="capitalize text-[2.5mm]">
+                          {mappedJob[key[1]]}
+                        </p>
+                      </div>
+                    );
+                  }
                 })}
               </div>
             </div>
@@ -217,11 +257,24 @@ app.post('/:process/labels', async (c) => {
   );
 });
 
-app.get('/ui/add', (c) => {
-  return c.html(<Label />);
-});
+const server = serve(
+  {
+    fetch: app.fetch,
+    port: 3000,
+  },
+  (info) => console.log(`Running Axios Labels on port ${info.port}...`)
+);
 
-serve({
-  fetch: app.fetch,
-  port: 3000,
+process.on("SIGINT", () => {
+  server.close();
+  process.exit(0);
+});
+process.on("SIGTERM", () => {
+  server.close((err) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+    process.exit(0);
+  });
 });

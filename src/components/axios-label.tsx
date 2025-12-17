@@ -1,5 +1,6 @@
-import { randomUUID } from 'crypto';
-import { toDataURL } from 'qrcode';
+import { randomUUID } from "crypto";
+import { toDataURL } from "qrcode";
+import { FC } from "hono/jsx";
 
 const LabelDetail: FC<{ key: string; value: string; span: number }> = (props: {
   key: string;
